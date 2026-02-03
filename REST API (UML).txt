@@ -1,0 +1,36 @@
+@startuml
+title "Создание пользователя"
+start
+:POST запрос приходит на /api/registration;
+:Парсинг запроса;
+if (JSON валиден?) then (нет)
+:возврат 400 VALIDATION_ERROR;
+end
+else (да)
+if (Проверка обязательных полей) then (не заполнены)
+:возврат 400 VALIDATION_ERROR;
+end
+else (заполнены)
+if (Проверка reCaptcha) then (не пройдена)
+:возврат 400 INVALID_CAPTCHA;
+end
+else (пройдена)
+if (Проверка анкеты) then (невалидно)
+:возврат 400 VALIDATION_ERROR;
+end
+else (валидно)
+if (Проверка требований к паролю) then (не соответствует)
+:возврат 400 VALIDATION_ERROR;
+end
+else (соответствует)
+if (проверка пользователя) then (существует)
+:возврат 409 USER_EXISTS;
+end
+else (не существует)
+:Хеширование пароля;
+:Создание записи в БД;
+:Генерация userId;
+:Возврат 200;
+stop
+
+@enduml
